@@ -15,7 +15,7 @@ fn test_blake3_merkle(len: usize) -> Result<(), Box<dyn Error>> {
   merkle.write(&bin)?;
   merkle.finalize();
   if merkle.blake3() != blake3.finalize() {
-    dbg!(bin.len(), merkle.li);
+    dbg!(len, merkle.li);
     panic!();
   }
   Ok(())
@@ -25,7 +25,7 @@ fn main() -> Result<(), Box<dyn Error>> {
   for n in 0..2049 {
     test_blake3_merkle(n)?;
     let base = n * CHUNK_LEN;
-    for len in [base, base + (rand::random::<u8>() as usize)] {
+    for len in [base, base + 1, base + (rand::random::<u8>() as usize)] {
       test_blake3_merkle(len)?;
     }
   }
