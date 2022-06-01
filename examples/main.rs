@@ -7,22 +7,27 @@ use std::{
   io::{copy, Write},
 };
 
-fn test_blake3_merkle(bin: &[u8]) -> Result<(), Box<dyn Error>> {
+fn test_blake3_merkle(len: usize) -> Result<(), Box<dyn Error>> {
+  let bin: Vec<u8> = (0..len).map(|_| rand::random()).collect();
   let mut blake3 = blake3::Hasher::new();
-  blake3.update(bin);
+  blake3.update(&bin);
   let mut merkle = Merkle::new();
-  merkle.write(bin)?;
+  merkle.write(&bin)?;
   merkle.finalize();
   if merkle.blake3() != blake3.finalize() {
     dbg!(bin.len(), merkle.li);
+    panic!();
   }
   Ok(())
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
-  for len in [0, 1, CHUNK_LEN / 2, CHUNK_LEN - 1, CHUNK_LEN, CHUNK_LEN + 1] {
-    let bin: Vec<u8> = (0..len).map(|_| rand::random::<u8>()).collect();
-    test_blake3_merkle(&bin)?;
+  for n in 0..2049 {
+    test_blake3_merkle(n)?;
+    let base = n * CHUNK_LEN;
+    for len in [base, base + (rand::random::<u8>() as usize)] {
+      test_blake3_merkle(len)?;
+    }
   }
 
   /*

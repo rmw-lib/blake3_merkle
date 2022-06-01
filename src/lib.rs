@@ -40,12 +40,13 @@ impl Merkle {
   pub fn finalize(&mut self) {
     let mut len = self.li.len();
     let end = len == 0;
-    if self.pos > 0 {
-      self.push(end);
-    }
-    if len == 0 {
+    if self.pos != 0 {
+      self.push(true);
+      len = self.li.len();
+    } else if end {
       return;
     }
+
     let li = &mut self.li;
     len -= 1;
     let mut hash = li[len].hash;
@@ -108,10 +109,10 @@ impl Merkle {
   }
 
   fn push(&mut self, finalize: bool) {
-    let mut hash = self.state.finalize(finalize);
     let li = &mut self.li;
-
     let mut len = li.len();
+    let mut hash = self.state.finalize(finalize && len == 0);
+
     let mut depth = 0;
     while len > 0 {
       len -= 1;
@@ -167,54 +168,3 @@ impl Write for Merkle {
     Ok(())
   }
 }
-/*
-pub fn merkle(mut input: impl Read) -> Result<Merkle, Error> {
-  let mut merkle = Merkle::new();
-  let mut buf: [u8; CHUNK_LEN] = unsafe { std::mem::MaybeUninit::uninit().assume_init() };
-  let mut n: u64 = 0;
-
-  #[allow(invalid_value)]
-  let mut state: ChunkState = unsafe { std::mem::MaybeUninit::uninit().assume_init() };
-
-  macro_rules! push {
-    ($finalize:expr) => {
-      merkle.push(state, $finalize);
-    };
-  }
-
-  loop {
-    match input.read(&mut buf)? {
-      CHUNK_LEN => {
-        if n > 0 {
-          push!(false);
-        }
-        state = ChunkState::new(n);
-        state.update(&buf);
-        n += 1;
-      }
-      0 => {
-        if n > 0 {
-          push!(n == 1);
-        } else {
-          state = ChunkState::new(0);
-          state.update(&[]);
-          push!(true);
-        }
-        break;
-      }
-      readed => {
-        let is_root = n == 0;
-        if !is_root {
-          push!(false);
-        }
-        state = ChunkState::new(n);
-        state.update(&buf[..readed]);
-        push!(is_root);
-        break;
-      }
-    }
-  }
-  merkle.finalize();
-  Ok(merkle)
-}
-*/
