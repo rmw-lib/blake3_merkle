@@ -49,9 +49,9 @@ impl Merkle {
       0 => ChunkState::new(0).update(&[]).finalize(true),
       1 => li[0].hash,
       2 => parent_cv(&li[0].hash, &li[1].hash, true),
-      n => {
+      len => {
         let mut hash_li =
-          unsafe { Box::<[Hash]>::new_uninit_slice((n / 2) + (n % 2)).assume_init() };
+          unsafe { Box::<[Hash]>::new_uninit_slice((len / 2) + (len % 2)).assume_init() };
 
         hash_li[0] = parent_cv(&li[0].hash, &li[1].hash, false);
         hash_li[1] = parent_cv(&li[2].hash, &li[3].hash, false);
