@@ -85,7 +85,6 @@ impl Merkle {
 
 pub fn merkle(mut input: impl Read) -> Result<Merkle, Error> {
   let mut merkle = Merkle::default();
-  dbg!(CHUNK_LEN);
   let mut buf: [u8; CHUNK_LEN] = unsafe { std::mem::MaybeUninit::uninit().assume_init() };
   let mut n: u64 = 0;
 
