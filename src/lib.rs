@@ -1,3 +1,5 @@
+#![feature(new_uninit)]
+
 use blake3::{
   guts::{parent_cv, ChunkState, CHUNK_LEN},
   Hash,
@@ -48,9 +50,12 @@ impl Merkle {
       1 => li[0].hash,
       2 => parent_cv(&li[0].hash, &li[1].hash, true),
       n => {
-        let hash1 = parent_cv(&li[0].hash, &li[1].hash, false);
-        let hash2 = parent_cv(&li[2].hash, &li[3].hash, false);
-        let hash3 = parent_cv(&hash1, &hash2, true);
+        let mut hash_li =
+          unsafe { Box::<[Hash]>::new_uninit_slice((n / 2) + (n % 2)).assume_init() };
+
+        hash_li[0] = parent_cv(&li[0].hash, &li[1].hash, false);
+        hash_li[1] = parent_cv(&li[2].hash, &li[3].hash, false);
+        let hash3 = parent_cv(&hash_li[0], &hash_li[1], true);
         hash3
       }
     }
