@@ -6,7 +6,7 @@ use blake3::{
 };
 
 use std::{
-  io::{Error, Read, Write},
+  io::{Error, Write},
   mem::replace,
 };
 
@@ -36,9 +36,12 @@ impl Merkle {
       state: ChunkState::new(0),
     }
   }
+
   pub fn finalize(&mut self) {
+    let len = self.li.len();
+    self.push(len == 0);
     let li = &mut self.li;
-    let len = li.len();
+
     let mut len = len - 1;
     let mut hash = li[len].hash;
 
@@ -99,8 +102,8 @@ impl Merkle {
     }
   }
 
-  pub fn push(&mut self, state: ChunkState, finalize: bool) {
-    let mut hash = state.finalize(finalize);
+  fn push(&mut self, finalize: bool) {
+    let mut hash = self.state.finalize(finalize);
     let li = &mut self.li;
 
     let mut len = li.len();
@@ -126,22 +129,24 @@ impl Write for Merkle {
     let len = buf.len();
     let mut pos = self.pos;
     let mut n = self.n;
-
-    let begin = 0;
+    let mut remain = CHUNK_LEN - pos;
+    let mut begin = 0;
 
     while begin < len {
       let diff = len - begin;
-      if diff < (CHUNK_LEN - pos) {
+      if diff < remain {
         pos += diff;
         self.state.update(&buf[begin..]);
-
-        n += 1;
-        let state = replace(&mut self.state, ChunkState::new(n));
-        self.push(state, false);
         break;
       } else {
+        let end = begin + remain;
+        self.state.update(&buf[begin..end]);
+        begin = end;
+        self.push(false);
         n += 1;
-        break;
+        self.state = ChunkState::new(n);
+        pos = 0;
+        remain = CHUNK_LEN;
       }
     }
     self.pos = pos;
@@ -150,15 +155,10 @@ impl Write for Merkle {
   }
 
   fn flush(&mut self) -> Result<(), Error> {
-    #[allow(invalid_value)]
-    let state = replace(&mut self.state, unsafe {
-      std::mem::MaybeUninit::uninit().assume_init()
-    });
-    self.push(state, true);
     Ok(())
   }
 }
-
+/*
 pub fn merkle(mut input: impl Read) -> Result<Merkle, Error> {
   let mut merkle = Merkle::new();
   let mut buf: [u8; CHUNK_LEN] = unsafe { std::mem::MaybeUninit::uninit().assume_init() };
@@ -208,3 +208,4 @@ pub fn merkle(mut input: impl Read) -> Result<Merkle, Error> {
   merkle.finalize();
   Ok(merkle)
 }
+*/

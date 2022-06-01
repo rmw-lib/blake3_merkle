@@ -1,5 +1,9 @@
 use blake3_merkle::Merkle;
-use std::{error::Error, fs::File, io::copy};
+use std::{
+  error::Error,
+  fs::File,
+  io::{copy, Write},
+};
 
 fn main() -> Result<(), Box<dyn Error>> {
   let fpath = "/Users/z/Downloads/1.pdf";
@@ -9,6 +13,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
   let mut merkle = Merkle::new();
   copy(&mut File::open(&fpath)?, &mut merkle)?;
+  merkle.finalize();
   dbg!(&merkle.li);
   dbg!(merkle.blake3());
   dbg!(blake3.finalize());
