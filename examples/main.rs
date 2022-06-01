@@ -13,7 +13,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
   let f = File::open(&fpath)?;
   let merkle = merkle(BufReader::new(f))?;
-  dbg!(&merkle);
+  dbg!(&merkle.li);
   dbg!(merkle.blake3());
   dbg!(blake3.finalize());
 
