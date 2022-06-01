@@ -5,7 +5,10 @@ use blake3::{
   Hash,
 };
 
-use std::io::{Error, Read};
+use std::{
+  io::{Error, Read, Write},
+  mem::replace,
+};
 
 #[derive(Debug)]
 pub struct HashDepth {
@@ -16,12 +19,23 @@ pub struct HashDepth {
 // (1<<10) * 1024 = 1MB
 pub const BLOCK_CHUNK: u8 = 10;
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct Merkle {
   pub li: Vec<HashDepth>,
+  pub pos: usize,
+  pub n: u64,
+  pub state: ChunkState,
 }
 
 impl Merkle {
+  pub fn new() -> Self {
+    Merkle {
+      li: vec![],
+      pos: 0,
+      n: 0,
+      state: ChunkState::new(0),
+    }
+  }
   pub fn finalize(&mut self) {
     let li = &mut self.li;
     let len = li.len();
@@ -107,8 +121,46 @@ impl Merkle {
   }
 }
 
+impl Write for Merkle {
+  fn write(&mut self, buf: &[u8]) -> Result<usize, Error> {
+    let len = buf.len();
+    let mut pos = self.pos;
+    let mut n = self.n;
+
+    let begin = 0;
+
+    while begin < len {
+      let diff = len - begin;
+      if diff < (CHUNK_LEN - pos) {
+        pos += diff;
+        self.state.update(&buf[begin..]);
+
+        n += 1;
+        let state = replace(&mut self.state, ChunkState::new(n));
+        self.push(state, false);
+        break;
+      } else {
+        n += 1;
+        break;
+      }
+    }
+    self.pos = pos;
+    self.n = n;
+    Ok(len)
+  }
+
+  fn flush(&mut self) -> Result<(), Error> {
+    #[allow(invalid_value)]
+    let state = replace(&mut self.state, unsafe {
+      std::mem::MaybeUninit::uninit().assume_init()
+    });
+    self.push(state, true);
+    Ok(())
+  }
+}
+
 pub fn merkle(mut input: impl Read) -> Result<Merkle, Error> {
-  let mut merkle = Merkle::default();
+  let mut merkle = Merkle::new();
   let mut buf: [u8; CHUNK_LEN] = unsafe { std::mem::MaybeUninit::uninit().assume_init() };
   let mut n: u64 = 0;
 
