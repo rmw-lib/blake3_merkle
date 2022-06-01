@@ -39,7 +39,7 @@ impl Merkle {
       }
       hash = parent_cv(&left.hash, &hash, 0 == len);
     }
-    dbg!(&li);
+    //dbg!(&li);
   }
 
   pub fn blake3(&self) -> Hash {
@@ -50,13 +50,37 @@ impl Merkle {
       1 => li[0].hash,
       2 => parent_cv(&li[0].hash, &li[1].hash, true),
       len => {
-        let mut hash_li =
-          unsafe { Box::<[Hash]>::new_uninit_slice((len / 2) + (len % 2)).assume_init() };
+        let mut hash_len = len / 2;
+        let end = len % 2;
+        let mut box_len = hash_len + end;
+        let mut hash_li = unsafe { Box::<[Hash]>::new_uninit_slice(box_len).assume_init() };
+        if end != 0 {
+          hash_li[hash_len] = li[len - 1].hash;
+        }
 
-        hash_li[0] = parent_cv(&li[0].hash, &li[1].hash, false);
-        hash_li[1] = parent_cv(&li[2].hash, &li[3].hash, false);
-        let hash3 = parent_cv(&hash_li[0], &hash_li[1], true);
-        hash3
+        while hash_len != 0 {
+          hash_len -= 1;
+          let t = hash_len * 2;
+          hash_li[hash_len] = parent_cv(&li[t].hash, &li[t + 1].hash, false);
+        }
+        while box_len > 2 {
+          let mut hash_len = box_len / 2;
+          let end = box_len % 2;
+          let len = hash_len + end;
+          let mut li = unsafe { Box::<[Hash]>::new_uninit_slice(len).assume_init() };
+          if end != 0 {
+            li[hash_len] = hash_li[box_len - 1];
+          }
+          while hash_len != 0 {
+            hash_len -= 1;
+            let t = hash_len * 2;
+            li[hash_len] = parent_cv(&hash_li[t], &hash_li[t + 1], false);
+          }
+          box_len = len;
+          hash_li = li
+        }
+
+        parent_cv(&hash_li[0], &hash_li[1], true)
       }
     }
   }
