@@ -38,11 +38,16 @@ impl Merkle {
   }
 
   pub fn finalize(&mut self) {
-    let len = self.li.len();
-    self.push(len == 0);
+    let mut len = self.li.len();
+    let end = len == 0;
+    if self.pos > 0 {
+      self.push(end);
+    }
+    if len == 0 {
+      return;
+    }
     let li = &mut self.li;
-
-    let mut len = len - 1;
+    len -= 1;
     let mut hash = li[len].hash;
 
     while len > 0 {
@@ -133,6 +138,13 @@ impl Write for Merkle {
     let mut begin = 0;
 
     while begin < len {
+      if remain == 0 {
+        self.push(false);
+        n += 1;
+        self.state = ChunkState::new(n);
+        pos = 0;
+        remain = CHUNK_LEN;
+      }
       let diff = len - begin;
       if diff < remain {
         pos += diff;
@@ -142,11 +154,8 @@ impl Write for Merkle {
         let end = begin + remain;
         self.state.update(&buf[begin..end]);
         begin = end;
-        self.push(false);
-        n += 1;
-        self.state = ChunkState::new(n);
-        pos = 0;
-        remain = CHUNK_LEN;
+        remain = 0;
+        pos = CHUNK_LEN;
       }
     }
     self.pos = pos;
