@@ -42,10 +42,18 @@ impl Merkle {
 
   pub fn blake3(&self) -> Hash {
     let li = &self.li;
-    let hash1 = parent_cv(&li[0].hash, &li[1].hash, false);
-    let hash2 = parent_cv(&li[2].hash, &li[3].hash, false);
-    let hash3 = parent_cv(&hash1, &hash2, true);
-    hash3
+    let len = li.len();
+    match len {
+      0 => ChunkState::new(0).update(&[]).finalize(true),
+      1 => li[0].hash,
+      2 => parent_cv(&li[0].hash, &li[1].hash, true),
+      n => {
+        let hash1 = parent_cv(&li[0].hash, &li[1].hash, false);
+        let hash2 = parent_cv(&li[2].hash, &li[3].hash, false);
+        let hash3 = parent_cv(&hash1, &hash2, true);
+        hash3
+      }
+    }
   }
 
   pub fn push(&mut self, state: ChunkState, finalize: bool) {
