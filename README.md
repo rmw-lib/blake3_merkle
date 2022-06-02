@@ -13,5 +13,5 @@ bao 目前的实现会消耗 6% 的额外存储空间来记录验证哈希，对
 运行 `./example.sh`，输出如下
 
 ```rust
-#inclue ./main.out
+
 ```
