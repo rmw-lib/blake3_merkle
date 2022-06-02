@@ -14,14 +14,19 @@ fn test_blake3_merkle(len: usize) -> Result<(), Box<dyn Error>> {
   let mut merkle = Merkle::new();
   merkle.write(&bin)?;
   merkle.finalize();
-  if merkle.blake3() != blake3.finalize() {
+  let true_hash = blake3.finalize();
+  if merkle.blake3() != true_hash {
     dbg!(len, merkle.li);
+    dbg!(true_hash);
     panic!();
   }
   Ok(())
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
+  test_blake3_merkle(6145);
+  return Ok(());
+
   for n in 0..2049 {
     test_blake3_merkle(n)?;
     let base = n * CHUNK_LEN;

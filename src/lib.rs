@@ -10,7 +10,7 @@ use std::{
   mem::replace,
 };
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct HashDepth {
   hash: Hash,
   depth: u8,
@@ -62,7 +62,6 @@ impl Merkle {
       }
       hash = parent_cv(&left.hash, &hash, 0 == len);
     }
-    //dbg!(&li);
   }
 
   pub fn blake3(&self) -> Hash {
@@ -73,37 +72,77 @@ impl Merkle {
       1 => li[0].hash,
       2 => parent_cv(&li[0].hash, &li[1].hash, true),
       len => {
-        let mut hash_len = len / 2;
+        /*
+        let mut len = len;
+        let mut pre_li;
+
+        'outer: while len > 2 {
+        let mut hash_li = Vec::with_capacity(len);
+        let mut n = 0;
+        let mut n_1 = n + 1;
+        while n_1 < len {
+        let li_n = &li[n];
+        let li_n_1 = &li[n_1];
+        let depth = li_n.depth;
+        if depth == li_n_1.depth {
+        hash_li.push(HashDepth {
+        depth: depth + 1,
+        hash: parent_cv(&li_n.hash, &li_n_1.hash, false),
+        })
+        } else if n == 0 {
+        break 'outer;
+        }
+        n = n_1 + 1;
+        n_1 = n + 1;
+        }
+        if n == len {
+        hash_li.copy_from_slice(li[n - 1].clone());
+        }
+        len = hash_li.len();
+        pre_li = hash_li;
+        li = &pre_li;
+        }
+        */
+
+        let mut len = len;
+        let hash_len = len / 2;
         let end = len % 2;
         let mut box_len = hash_len + end;
         let mut hash_li = unsafe { Box::<[Hash]>::new_uninit_slice(box_len).assume_init() };
+
         if end != 0 {
-          hash_li[hash_len] = li[len - 1].hash;
+          hash_li[0] = li[0].hash;
         }
 
-        while hash_len != 0 {
-          hash_len -= 1;
-          let t = hash_len * 2;
-          hash_li[hash_len] = parent_cv(&li[t].hash, &li[t + 1].hash, false);
+        while len >= 2 {
+          let t = len - 1;
+          len = t - 1;
+          hash_li[t / 2] = parent_cv(&li[len].hash, &li[t].hash, false);
         }
+
+        len = hash_len;
+        let mut li = hash_li;
+
         while box_len > 2 {
-          let mut hash_len = box_len / 2;
-          let end = box_len % 2;
-          let len = hash_len + end;
-          let mut li = unsafe { Box::<[Hash]>::new_uninit_slice(len).assume_init() };
+          let hash_len = len / 2;
+          let end = len % 2;
+          let mut box_len = hash_len + end;
+          let mut hash_li = unsafe { Box::<[Hash]>::new_uninit_slice(box_len).assume_init() };
+
           if end != 0 {
-            li[hash_len] = hash_li[box_len - 1];
+            hash_li[0] = li[0];
           }
-          while hash_len != 0 {
-            hash_len -= 1;
-            let t = hash_len * 2;
-            li[hash_len] = parent_cv(&hash_li[t], &hash_li[t + 1], false);
+
+          while len >= 2 {
+            let t = len - 1;
+            len = t - 1;
+            hash_li[t / 2] = parent_cv(&li[len], &li[t], false);
           }
-          box_len = len;
-          hash_li = li
+          len = hash_len;
+          li = hash_li;
         }
 
-        parent_cv(&hash_li[0], &hash_li[1], true)
+        parent_cv(&li[0], &li[1], true)
       }
     }
   }
