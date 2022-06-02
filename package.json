@@ -1,26 +1,7 @@
 {
-  "name": "@rmw/coffee_template",
-  "repository": "git@github.com:rmw-lib/coffee_template.git",
-  "version": "0.0.0",
-  "exports": {
-    ".": {
-      "require": "./lib/index.cjs",
-      "import": "./lib/index.js"
-    },
-    "./*": {
-      "import": "./lib/*",
-      "require": "./lib/*"
-    }
-  },
-  "files": [
-    "lib/*"
-  ],
-  "main": "index.js",
-  "author": "gcxfd <i@rmw.link>",
-  "license": "AGPL-3.0",
   "type": "module",
   "scripts": {
-    "prepare": "rm -rf lib && mkdir -p lib && rsync -av --include='*/' --exclude='*.coffee' src/ lib && npx coffee --compile --output lib src/ && babel --plugins @babel/plugin-transform-modules-commonjs lib -d lib --out-file-extension .cjs && npx md-include .markdown.json"
+    "prepare": "npx md-include .markdown.json"
   },
   "devDependencies": {
     "@rmw/coffee-loader": "^0.0.4",
