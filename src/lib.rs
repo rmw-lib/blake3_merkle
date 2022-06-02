@@ -72,77 +72,22 @@ impl Merkle {
       1 => li[0].hash,
       2 => parent_cv(&li[0].hash, &li[1].hash, true),
       len => {
-        /*
         let mut len = len;
-        let mut pre_li;
 
-        'outer: while len > 2 {
-        let mut hash_li = Vec::with_capacity(len);
-        let mut n = 0;
-        let mut n_1 = n + 1;
-        while n_1 < len {
-        let li_n = &li[n];
-        let li_n_1 = &li[n_1];
-        let depth = li_n.depth;
-        if depth == li_n_1.depth {
-        hash_li.push(HashDepth {
-        depth: depth + 1,
-        hash: parent_cv(&li_n.hash, &li_n_1.hash, false),
-        })
-        } else if n == 0 {
-        break 'outer;
-        }
-        n = n_1 + 1;
-        n_1 = n + 1;
-        }
-        if n == len {
-        hash_li.copy_from_slice(li[n - 1].clone());
-        }
-        len = hash_li.len();
-        pre_li = hash_li;
-        li = &pre_li;
-        }
-        */
+        len -= 1;
+        let right = &li[len].hash;
+        len -= 1;
+        let mut finalize = len == 0;
 
-        let mut len = len;
-        let hash_len = len / 2;
-        let end = len % 2;
-        let mut box_len = hash_len + end;
-        let mut hash_li = unsafe { Box::<[Hash]>::new_uninit_slice(box_len).assume_init() };
+        let mut hash = parent_cv(&li[len].hash, right, finalize);
 
-        if end != 0 {
-          hash_li[0] = li[0].hash;
+        while !finalize {
+          len -= 1;
+          finalize = len == 0;
+          hash = parent_cv(&li[len].hash, &hash, finalize);
         }
 
-        while len >= 2 {
-          let t = len - 1;
-          len = t - 1;
-          hash_li[t / 2] = parent_cv(&li[len].hash, &li[t].hash, false);
-        }
-
-        len = hash_len;
-        let mut li = hash_li;
-
-        while box_len > 2 {
-          let hash_len = len / 2;
-          let end = len % 2;
-          let mut box_len = hash_len + end;
-          let mut hash_li = unsafe { Box::<[Hash]>::new_uninit_slice(box_len).assume_init() };
-
-          if end != 0 {
-            hash_li[0] = li[0];
-          }
-
-          while len >= 2 {
-            let t = len - 1;
-            len = t - 1;
-            hash_li[t / 2] = parent_cv(&li[len], &li[t], false);
-          }
-          len = hash_len;
-          li = hash_li;
-        }
-
-        parent_cv(&li[0], &li[1], true)
+        hash
       }
     }
   }

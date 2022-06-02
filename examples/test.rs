@@ -19,13 +19,14 @@ fn test_blake3_merkle(len: usize) -> Result<(), Box<dyn Error>> {
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
-  test_blake3_merkle(14337);
-  return Ok(());
+  //test_blake3_merkle(14337)?;
+  //return Ok(());
 
   for n in 0..2049 {
+    dbg!(n);
     test_blake3_merkle(n)?;
     let base = n * CHUNK_LEN;
-    for len in [base, base + 1, base + (rand::random::<u8>() as usize)] {
+    for len in [base, base + 1, base + (rand::random::<u16>() as usize)] {
       test_blake3_merkle(len)?;
     }
   }
