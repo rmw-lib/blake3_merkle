@@ -9,8 +9,8 @@ use std::io::{Error, Write};
 
 #[derive(Debug, Clone)]
 pub struct HashDepth {
-  hash: Hash,
-  depth: u8,
+  pub hash: Hash,
+  pub depth: u8,
 }
 
 pub const BLOCK_CHUNK: u8 = 10;

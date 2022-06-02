@@ -1,6 +1,8 @@
 use blake3::guts::CHUNK_LEN;
-use blake3_merkle::Merkle;
+use blake3_merkle::{Merkle, BLOCK_CHUNK};
 use std::{error::Error, io::Write};
+
+const BLOCK_SIZE: usize = (1 << BLOCK_CHUNK) * CHUNK_LEN;
 
 fn test_blake3_merkle(len: usize) -> Result<(), Box<dyn Error>> {
   let bin: Vec<u8> = (0..len).map(|_| rand::random()).collect();
@@ -10,12 +12,17 @@ fn test_blake3_merkle(len: usize) -> Result<(), Box<dyn Error>> {
   let _ = merkle.write(&bin)?;
   merkle.finalize();
   let true_hash = blake3.finalize();
-  //dbg!(&merkle.li);
-  //dbg!(true_hash);
   if merkle.blake3() != true_hash {
     dbg!(len, merkle.li);
     dbg!(true_hash);
     panic!();
+  }
+  if len < BLOCK_SIZE && len > 0 {
+    if merkle.li[0].hash != true_hash || merkle.li.len() != 1 {
+      dbg!(true_hash);
+      dbg!(&merkle.li[0]);
+      panic!();
+    }
   }
   Ok(())
 }
