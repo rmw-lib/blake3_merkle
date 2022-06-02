@@ -1,16 +1,20 @@
 <!-- 本文件由 ./make.md 自动生成，请不要直接修改此文件 -->
 
-# 基于 blake3 的 merkle tree
+# blake3_merkle
 
-[blake3](https://github.com/BLAKE3-team/BLAKE3) 底层是 merkle tree ，但是暴露的接口无法导出 merkle tree 。
+→ [中文说明](#cn)
 
-[bao](https://github.com/oconnor663/bao) 实现了 blake3 流式验证，但无法调整底层块大小 (参见 [support larger "chunk groups" for reduced space overhead](https://github.com/oconnor663/bao/issues/34) ) 。
+## Merkle tree based on blake3
 
-也就是说， bao 会消耗 6% 的额外存储空间来记录 merkle tree。对于分布式内容索引来说，这是挺大的开销。
+[blake3](https://github.com/BLAKE3-team/BLAKE3) is based on merkle tree, but the exposed interface cannot export merkle tree.
 
-于是，我实现了 [blake3_merkle](https://github.com/rmw-lib/blake3_merkle) ，每 1MB 内容导出 32 字节的哈希，额外存储开销只有 0.3‱  。
+[bao](https://github.com/oconnor663/bao) implements blake3 streaming verification, but cannot resize the underlying chunks (see [support larger "chunk groups" for reduced space overhead](https://github.com/oconnor663/bao/issues/34) ).
 
-`./examples/main.rs` 如下 :
+This means that bao consumes 6% extra storage space to record the merkle tree, which is a significant overhead for a distributed content index.
+
+So, I implemented [blake3_merkle](https://github.com/rmw-lib/blake3_merkle) to export 32 bytes of hash per 1MB of content with an additional storage overhead of only 0.3‱.
+
+`./examples/main.rs` As follows :
 
 ```rust
 use blake3_merkle::Merkle;
@@ -33,7 +37,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 }
 ```
 
-运行 `./example.main.sh`，输出如下
+Run `./example.main.sh`and the output is as follows
 
 ```
 [examples/main.rs:14] &merkle.li = [
@@ -70,17 +74,18 @@ fn main() -> Result<(), Box<dyn Error>> {
 )
 ```
 
-# Merkle tree based on blake3
+<b id=cn></b>
+## 基于 blake3 的 merkle tree
 
-[blake3](https://github.com/BLAKE3-team/BLAKE3) is based on merkle tree, but the exposed interface cannot export merkle tree.
+[blake3](https://github.com/BLAKE3-team/BLAKE3) 底层是 merkle tree ，但是暴露的接口无法导出 merkle tree 。
 
-[bao](https://github.com/oconnor663/bao) implements blake3 streaming verification, but cannot resize the underlying chunks (see [support larger "chunk groups" for reduced space overhead](https://github.com/oconnor663/bao/issues/34) ).
+[bao](https://github.com/oconnor663/bao) 实现了 blake3 流式验证，但无法调整底层块大小 (参见 [support larger "chunk groups" for reduced space overhead](https://github.com/oconnor663/bao/issues/34) ) 。
 
-This means that bao consumes 6% extra storage space to record the merkle tree, which is a significant overhead for a distributed content index.
+也就是说， bao 会消耗 6% 的额外存储空间来记录 merkle tree。对于分布式内容索引来说，这是挺大的开销。
 
-So, I implemented [blake3_merkle](https://github.com/rmw-lib/blake3_merkle) to export 32 bytes of hash per 1MB of content with an additional storage overhead of only 0.3‱.
+于是，我实现了 [blake3_merkle](https://github.com/rmw-lib/blake3_merkle) ，每 1MB 内容导出 32 字节的哈希，额外存储开销只有 0.3‱  。
 
-`./examples/main.rs` As follows :
+`./examples/main.rs` 如下 :
 
 ```rust
 use blake3_merkle::Merkle;
@@ -103,7 +108,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 }
 ```
 
-Run `./example.main.sh`and the output is as follows
+运行 `./example.main.sh`，输出如下
 
 ```
 [examples/main.rs:14] &merkle.li = [
