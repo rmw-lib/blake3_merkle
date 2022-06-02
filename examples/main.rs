@@ -1,10 +1,10 @@
-use blake3::guts::CHUNK_LEN;
+
 use blake3_merkle::Merkle;
-use rand::Rng;
+
 use std::{
   error::Error,
   fs::File,
-  io::{copy, Write},
+  io::{copy},
 };
 
 fn main() -> Result<(), Box<dyn Error>> {
