@@ -52,18 +52,23 @@ impl Merkle {
 
     let li = &mut self.li;
     len -= 1;
-    let mut hash = li[len].hash;
 
-    while len > 0 {
-      len -= 1;
-      let left = &li[len];
-      if left.depth == BLOCK_CHUNK {
-        len += 1;
-        li[len].hash = hash;
-        li.truncate(len + 1);
-        break;
+    if len > 0 {
+      let mut hash = li[len].hash;
+      while len > 0 {
+        len -= 1;
+        let left = &li[len];
+        if left.depth == BLOCK_CHUNK {
+          len += 1;
+          li[len].hash = hash;
+          li.truncate(len + 1);
+          return;
+        }
+        hash = parent_cv(&left.hash, &hash, 0 == len);
       }
-      hash = parent_cv(&left.hash, &hash, 0 == len);
+
+      li.truncate(1);
+      li[0].hash = hash;
     }
   }
 

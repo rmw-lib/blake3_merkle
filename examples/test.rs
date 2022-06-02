@@ -10,6 +10,8 @@ fn test_blake3_merkle(len: usize) -> Result<(), Box<dyn Error>> {
   let _ = merkle.write(&bin)?;
   merkle.finalize();
   let true_hash = blake3.finalize();
+  //dbg!(&merkle.li);
+  //dbg!(true_hash);
   if merkle.blake3() != true_hash {
     dbg!(len, merkle.li);
     dbg!(true_hash);
@@ -19,8 +21,8 @@ fn test_blake3_merkle(len: usize) -> Result<(), Box<dyn Error>> {
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
-  //  test_blake3_merkle(8193)?;
-  // return Ok(());
+  //test_blake3_merkle(1033462)?;
+  //return Ok(());
 
   for n in 0..2049 {
     dbg!(n);
