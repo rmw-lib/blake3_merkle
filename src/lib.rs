@@ -17,7 +17,7 @@ pub struct HashDepth {
 }
 
 // (1<<10) * 1024 = 1MB
-pub const BLOCK_CHUNK: u8 = 10;
+pub const BLOCK_CHUNK: u8 = 2;
 
 #[derive(Debug)]
 pub struct Merkle {
