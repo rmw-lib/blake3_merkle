@@ -19,8 +19,8 @@ fn test_blake3_merkle(len: usize) -> Result<(), Box<dyn Error>> {
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
-  test_blake3_merkle(8193)?;
-  return Ok(());
+  //  test_blake3_merkle(8193)?;
+  // return Ok(());
 
   for n in 0..2049 {
     dbg!(n);

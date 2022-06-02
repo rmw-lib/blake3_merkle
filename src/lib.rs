@@ -96,8 +96,30 @@ impl Merkle {
             box_li
           };
 
-          if n == 1 {
-            hash_li.push(li[0]);
+          loop {
+            if n == 1 {
+              hash_li.push(li[0]);
+              break;
+            }
+            if n % 2 != 0 {
+              n -= 1;
+              hash_li.push(li[n]);
+              hash_li_len += 1;
+            }
+            n /= 2;
+            if (n == 1) && (hash_li_len == 0) {
+              return parent_cv(&li[0], &li[1], true);
+            }
+            li = {
+              let mut box_li = unsafe { Box::<[Hash]>::new_uninit_slice(n).assume_init() };
+              let mut i = 0;
+              while i < n {
+                let t = 2 * i;
+                box_li[i] = parent_cv(&li[t], &li[t + 1], false);
+                i += 1;
+              }
+              box_li
+            }
           }
         }
 
