@@ -4,7 +4,7 @@
 
 [blake3](https://github.com/BLAKE3-team/BLAKE3) 底层是 merkle tree ，但是暴露的接口无法导出 merkle tree 。
 
-[bao](https://github.com/oconnor663/bao) 实现了 blake3 流式验证，但无法调整底层块大小 ( [support larger "chunk groups" for reduced space overhead](https://github.com/oconnor663/bao/issues/34) ) 。
+[bao](https://github.com/oconnor663/bao) 实现了 blake3 流式验证，但无法调整底层块大小 (参见 [support larger "chunk groups" for reduced space overhead](https://github.com/oconnor663/bao/issues/34) ) 。
 
 也就是说， bao 会消耗 6% 的额外存储空间来记录 merkle tree。对于分布式内容索引来说，这是挺大的开销。
 
@@ -72,10 +72,9 @@ fn main() -> Result<(), Box<dyn Error>> {
 
 # Merkle tree based on blake3
 
-The underlying merkle tree of [blake3](https://github.com/BLAKE3-team/BLAKE3) is a merkle tree, but the exposed interface cannot export the merkle tree.
+[blake3](https://github.com/BLAKE3-team/BLAKE3) is based on merkle tree, but the exposed interface cannot export merkle tree.
 
-[bao](https://github.com/oconnor663/bao) implements blake3 streaming verification, but cannot resize the underlying [chunks (support larger "chunk groups" for reduced space overhead](https://github.com/
-oconnor663/bao/issues/34) ).
+[bao](https://github.com/oconnor663/bao) implements blake3 streaming verification, but cannot resize the underlying chunks (see [support larger "chunk groups" for reduced space overhead](https://github.com/oconnor663/bao/issues/34) ).
 
 This means that bao consumes 6% extra storage space to record the merkle tree, which is a significant overhead for a distributed content index.
 
