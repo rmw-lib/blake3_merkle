@@ -16,6 +16,8 @@
 
 于是，我实现了 [blake3_merkle](https://github.com/rmw-lib/blake3_merkle) ，每 1MB 内容导出 32 字节的哈希，额外存储开销只有 0.3‱  。
 
+通过 merkle tree 可以生成和 blake3 一致的哈希值。
+
 当内容小于等于 1MB 时，merkle tree 只有一个节点，并且这个节点的哈希值等于 blake3 的哈希值。
 
 `./examples/main.rs` 如下 :
