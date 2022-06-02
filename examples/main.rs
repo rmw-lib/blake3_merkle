@@ -1,14 +1,9 @@
-
 use blake3_merkle::Merkle;
 
-use std::{
-  error::Error,
-  fs::File,
-  io::{copy},
-};
+use std::{env, error::Error, fs::File, io::copy};
 
 fn main() -> Result<(), Box<dyn Error>> {
-  let fpath = "/Users/z/Downloads/1.pdf";
+  let fpath = env::current_dir()?.join("test.pdf");
 
   let mut blake3 = blake3::Hasher::new();
   copy(&mut File::open(&fpath)?, &mut blake3)?;
