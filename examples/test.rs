@@ -17,7 +17,7 @@ fn test_blake3_merkle(len: usize) -> Result<(), Box<dyn Error>> {
     dbg!(true_hash);
     panic!();
   }
-  if len < BLOCK_SIZE && len > 0 {
+  if len <= BLOCK_SIZE && len > 0 {
     if merkle.li[0].hash != true_hash || merkle.li.len() != 1 {
       dbg!(true_hash);
       dbg!(&merkle.li[0]);
