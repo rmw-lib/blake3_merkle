@@ -1,6 +1,6 @@
 # 基于 blake3 的 merkle tree
 
-[blake3](https://github.com/BLAKE3-team/BLAKE3) 的底层是一棵 merkle tree ，但是暴露的接口无法导出 merkle tree 。
+[blake3](https://github.com/BLAKE3-team/BLAKE3) 底层是 merkle tree ，但是暴露的接口无法导出 merkle tree 。
 
 [bao](https://github.com/oconnor663/bao) 实现了 blake3 流式验证，但无法调整底层块大小 ( [support larger "chunk groups" for reduced space overhead](https://github.com/oconnor663/bao/issues/34) ) 。
 
