@@ -1,0 +1,5 @@
+{
+  "build": "README.md",
+  "files": ["./make.md"],
+  "tableOfContents": {}
+}

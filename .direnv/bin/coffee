@@ -1,0 +1,18 @@
+#!/usr/bin/env sh
+
+DIR=$(realpath $(dirname $(realpath "$0"))/../..)
+
+export NODE_PATH="$DIR/node_modules:$NODE_PATH"
+
+if [ $1 ];then
+filepath=$(realpath $1)
+fi
+
+exec node  --trace-warnings \
+  --es-module-specifier-resolution=node \
+  --trace-uncaught \
+  --experimental-fetch \
+  --expose-gc \
+  --experimental-loader \
+  "@rmw/coffee-loader" \
+  --unhandled-rejections=strict $filepath ${@:2:$#}
