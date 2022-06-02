@@ -1,6 +1,11 @@
 use blake3::guts::CHUNK_LEN;
 use blake3_merkle::Merkle;
-use std::{error::Error, io::Write};
+use rand::Rng;
+use std::{
+  error::Error,
+  fs::File,
+  io::{copy, Write},
+};
 
 fn test_blake3_merkle(len: usize) -> Result<(), Box<dyn Error>> {
   let bin: Vec<u8> = (0..len).map(|_| rand::random()).collect();
@@ -19,8 +24,8 @@ fn test_blake3_merkle(len: usize) -> Result<(), Box<dyn Error>> {
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
-  test_blake3_merkle(14337);
-  return Ok(());
+  //test_blake3_merkle(6145);
+  //return Ok(());
 
   for n in 0..2049 {
     test_blake3_merkle(n)?;
