@@ -2,6 +2,30 @@
 
 [→ 中文说明](#cn)
 
+[blake3](https://github.com/BLAKE3-team/BLAKE3) is based on merkle tree, but the exposed interface cannot export merkle tree.
+
+[bao](https://github.com/oconnor663/bao) implements blake3 streaming verification, but cannot resize the underlying [chunks](https://github.com/oconnor663/bao/issues/34) (see [support larger "chunk groups" for reduced space overhead](https://github.com/oconnor663/bao/issues/34) ).
+
+That is, bao consumes 6% extra storage space to record the merkle tree, which is a significant overhead for a distributed content index.
+
+So, I implemented [blake3_merkle](https://github.com/rmw-lib/blake3_merkle) to export 32 bytes of hash per 1MB of content with an additional storage overhead of only 0.3‱.
+
+The merkle tree can generate hash values consistent with blake3.
+
+When the content is less than or equal to 1MB, the merkle tree has only one node, and the hash of this node is equal to the hash of blake3.
+
+`./examples/main.rs` As follows :
+
+```rust
+#include ./examples/main.rs
+```
+
+Run `./example.main.sh` and the output is as follows
+
+```
+#include ./main.out
+```
+
 <b id=cn></b>
 
 ## 基于 blake3 的 merkle tree
