@@ -1,6 +1,6 @@
 # blake3_merkle
 
-→ [中文说明](#cn)
+[→ 中文说明](#cn)
 
 ## Merkle tree based on blake3
 
