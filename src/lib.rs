@@ -5,10 +5,7 @@ use blake3::{
   Hash,
 };
 
-use std::{
-  io::{Error, Write},
-  mem::replace,
-};
+use std::io::{Error, Write};
 
 #[derive(Debug, Clone)]
 pub struct HashDepth {
@@ -72,19 +69,32 @@ impl Merkle {
       1 => li[0].hash,
       2 => parent_cv(&li[0].hash, &li[1].hash, true),
       len => {
-        let mut len = len;
+        let mut n = 1;
+        while li[n].depth == BLOCK_CHUNK {
+          n += 1;
+          if n == len {
+            break;
+          }
+        }
+        if n % 2 == 0 {
+          n -= 1;
+        }
 
-        len -= 1;
-        let right = &li[len].hash;
-        len -= 1;
-        let mut finalize = len == 0;
+        let hash_li: Vec<_> = li[n..].iter().rev().map(|i| i.hash).collect();
 
-        let mut hash = parent_cv(&li[len].hash, right, finalize);
+        let mut len = hash_li.len() - 1;
+
+        n = 0;
+        let right = &hash_li[0];
+        n += 1;
+        let mut finalize = len == n;
+
+        let mut hash = parent_cv(&hash_li[n], right, finalize);
 
         while !finalize {
-          len -= 1;
-          finalize = len == 0;
-          hash = parent_cv(&li[len].hash, &hash, finalize);
+          n += 1;
+          finalize = len == n;
+          hash = parent_cv(&hash_li[n], &hash, finalize);
         }
 
         hash
