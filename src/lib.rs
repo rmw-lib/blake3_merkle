@@ -76,11 +76,25 @@ impl Merkle {
             break;
           }
         }
-        if n % 2 == 0 {
+        if n % 2 != 0 {
           n -= 1;
         }
 
-        let hash_li: Vec<_> = li[n..].iter().rev().map(|i| i.hash).collect();
+        let mut hash_li: Vec<_> = li[n..].iter().rev().map(|i| i.hash).collect();
+
+        if n != 0 {
+          let n = (n + 1) / 2;
+          let mut box_li = unsafe { Box::<[Hash]>::new_uninit_slice(n).assume_init() };
+          let mut i = 0;
+          while i < n {
+            let t = 2 * i;
+            box_li[i] = parent_cv(&li[t].hash, &li[t + 1].hash, false);
+            i += 1;
+          }
+          hash_li.push(box_li[0]);
+        }
+
+        dbg!(&hash_li);
 
         let mut len = hash_li.len() - 1;
 
