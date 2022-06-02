@@ -10,9 +10,32 @@ bao 目前的实现会消耗 6% 的额外存储空间来记录验证哈希，对
 
 而 `blake3_merkle` ，当 `BLOCK_CHUNK` 设置为 10 时， 每 (1<<10)*1024 = 1MB 会输出一个 32 字节的哈希，只会增加 0.3‱  的额外开销。
 
-运行 `./example.sh`，输出如下
+`./examples/main.rs` 如下 :
 
 ```rust
+use blake3_merkle::Merkle;
+
+use std::{env, error::Error, fs::File, io::copy};
+
+fn main() -> Result<(), Box<dyn Error>> {
+  let fpath = env::current_dir()?.join("test.pdf");
+
+  let mut blake3 = blake3::Hasher::new();
+  copy(&mut File::open(&fpath)?, &mut blake3)?;
+
+  let mut merkle = Merkle::new();
+  copy(&mut File::open(&fpath)?, &mut merkle)?;
+  merkle.finalize();
+  dbg!(&merkle.li);
+  dbg!(merkle.blake3());
+  dbg!(blake3.finalize());
+  Ok(())
+}
+```
+
+运行 `./example.main.sh`，输出如下
+
+```
 [examples/main.rs:14] &merkle.li = [
     HashDepth {
         hash: Hash(

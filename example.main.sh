@@ -13,3 +13,5 @@ fi
 RUST_BACKTRACE=1 cargo +nightly build --release --example main
 
 ./target/release/examples/main > main.out 2>&1
+
+cat main.out
