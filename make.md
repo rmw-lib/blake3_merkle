@@ -19,3 +19,26 @@
 ```
 #include ./main.out
 ```
+
+# Merkle tree based on blake3
+
+The underlying merkle tree of [blake3](https://github.com/BLAKE3-team/BLAKE3) is a merkle tree, but the exposed interface cannot export the merkle tree.
+
+[bao](https://github.com/oconnor663/bao) implements blake3 streaming verification, but cannot resize the underlying [chunks (support larger "chunk groups" for reduced space overhead](https://github.com/
+oconnor663/bao/issues/34) ).
+
+This means that bao consumes 6% extra storage space to record the merkle tree, which is a significant overhead for a distributed content index.
+
+So, I implemented [blake3_merkle](https://github.com/rmw-lib/blake3_merkle) to export 32 bytes of hash per 1MB of content with an additional storage overhead of only 0.3‱.
+
+`./examples/main.rs` As follows :
+
+```rust
+#include ./examples/main.rs
+```
+
+Run `./example.main.sh`and the output is as follows
+
+```
+#include ./main.out
+```
