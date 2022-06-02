@@ -14,7 +14,7 @@ pub struct HashDepth {
 }
 
 // (1<<10) * 1024 = 1MB
-pub const BLOCK_CHUNK: u8 = 2;
+pub const BLOCK_CHUNK: u8 = 3;
 
 #[derive(Debug)]
 pub struct Merkle {
@@ -84,18 +84,7 @@ impl Merkle {
         let mut hash_li_len = len - n;
 
         if n != 0 {
-          n = (n + 1) / 2;
-          let mut li = {
-            let mut box_li = unsafe { Box::<[Hash]>::new_uninit_slice(n).assume_init() };
-            let mut i = 0;
-            while i < n {
-              let t = 2 * i;
-              box_li[i] = parent_cv(&li[t].hash, &li[t + 1].hash, false);
-              i += 1;
-            }
-            box_li
-          };
-
+          let mut li: Box<[_]> = li[..n].iter().map(|i| i.hash).collect();
           loop {
             if n == 1 {
               hash_li.push(li[0]);
