@@ -151,3 +151,9 @@ fn main() -> Result<(), Box<dyn Error>> {
     "74a79d0bc37dcac64c493e872252f19e8bdb32dee306481a6827fa037b378c76",
 )
 ```
+
+### 关于
+
+本项目隶属于 **人民网络 ([rmw.link](//rmw.link))** 代码计划。
+
+![人民网络](https://raw.githubusercontent.com/rmw-link/logo/master/rmw.red.bg.svg)
