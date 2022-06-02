@@ -24,6 +24,12 @@ pub struct Merkle {
   pub state: ChunkState,
 }
 
+impl Default for Merkle {
+  fn default() -> Self {
+    Self::new()
+  }
+}
+
 impl Merkle {
   pub fn new() -> Self {
     Merkle {
