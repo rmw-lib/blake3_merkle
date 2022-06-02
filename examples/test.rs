@@ -7,7 +7,7 @@ fn test_blake3_merkle(len: usize) -> Result<(), Box<dyn Error>> {
   let mut blake3 = blake3::Hasher::new();
   blake3.update(&bin);
   let mut merkle = Merkle::new();
-  merkle.write(&bin)?;
+  let _ = merkle.write(&bin)?;
   merkle.finalize();
   let true_hash = blake3.finalize();
   if merkle.blake3() != true_hash {
